@@ -18,3 +18,7 @@ class Schedule:
                 return params
         # The end was reached: return the parameters from the last phase
         return params
+
+    def last_epoch(self):
+        last_epoch_key = list(self.running_epoch_to_parameters)[-1]
+        return last_epoch_key
