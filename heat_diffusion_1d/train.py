@@ -33,6 +33,7 @@ def main(
 
     logging.info(f"train.main(); device = {device}; architecture = {architecture}")
 
+    outputDirectory += "_" + architecture
     if not os.path.exists(outputDirectory):
         os.makedirs(outputDirectory)
 
@@ -91,6 +92,12 @@ def main(
             number_of_blocks=int(architecture_tokens[2]),
             block_width=int(architecture_tokens[3]),
             number_of_outputs=int(architecture_tokens[4])
+        )
+    elif architecture_tokens[0] == 'MLP':
+        neural_net = architectures.MLP(
+            number_of_inputs=int(architecture_tokens[1]),
+            layer_widths=ast.literal_eval(architecture_tokens[2]),
+            number_of_outputs=int(architecture_tokens[3])
         )
     else:
         raise NotImplementedError(f"train.main(): Not implemented architecture '{architecture}'")
