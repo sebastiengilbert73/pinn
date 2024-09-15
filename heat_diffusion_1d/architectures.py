@@ -171,3 +171,24 @@ class Wang2020(torch.nn.Module):
             act = (1.0 - Z) * U + Z * V  # (B, W)
         output_tsr = self.linear3(act)  # (B, N_o)
         return output_tsr
+
+class MLP(torch.nn.Module):
+    def __init__(self, number_of_inputs, layer_widths, number_of_outputs):
+        super().__init__()
+        self.blocks = torch.nn.ModuleDict()
+        self.blocks['layer1'] = torch.nn.Sequential(
+            torch.nn.Linear(number_of_inputs, layer_widths[0]),
+            torch.nn.Tanh()
+        )
+        for layer_ndx in range(2, len(layer_widths) + 1):
+            self.blocks[f'layer{layer_ndx}'] = torch.nn.Sequential(
+                torch.nn.Linear(layer_widths[layer_ndx - 2], layer_widths[layer_ndx - 1]),
+                torch.nn.Tanh()
+            )
+        self.blocks[f'layer{len(layer_widths) + 1}'] = torch.nn.Linear(layer_widths[-1], number_of_outputs)
+
+    def forward(self, input_tsr):  # input_tsr.shape = (B, Ni)
+        act = input_tsr
+        for layer_ndx in range(1, len(self.blocks) + 1):
+            act = self.blocks[f'layer{layer_ndx}'](act)
+        return act
