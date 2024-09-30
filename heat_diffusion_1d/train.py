@@ -3,6 +3,7 @@ import copy
 import logging
 import argparse
 import os
+import random
 import pandas as pd
 import torch
 import architectures
@@ -18,6 +19,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s %(levelname)s %(
 
 def main(
     outputDirectory,
+    randomSeed,
     initialProfile,
     architecture,
     duration,
@@ -36,6 +38,9 @@ def main(
     outputDirectory += "_" + architecture
     if not os.path.exists(outputDirectory):
         os.makedirs(outputDirectory)
+
+    random.seed(randomSeed)
+    torch.manual_seed(randomSeed)
 
     # Load the initial temperature profile
     initial_profile_df = pd.read_csv(initialProfile)
@@ -221,6 +226,7 @@ def main(
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--outputDirectory', help="The output directory. Default: './output_train'", default='./output_train')
+    parser.add_argument('--randomSeed', help="The random seed. Default: 0", type=int, default=0)
     parser.add_argument('--initialProfile', help="The initial temperature profile. Default: './heated_segments.csv'", default='./heated_segments.csv')
     parser.add_argument('--architecture', help="The neural network architecture. Default: 'ResidualNet_2_4_64_1'", default='ResidualNet_2_4_64_1')
     parser.add_argument('--duration', help="The simulation duration, in seconds. Default: 10.0", type=float, default=10.0)
@@ -233,6 +239,7 @@ if __name__ == '__main__':
 
     main(
         args.outputDirectory,
+        args.randomSeed,
         args.initialProfile,
         args.architecture,
         args.duration,
